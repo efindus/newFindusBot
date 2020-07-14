@@ -6,7 +6,7 @@ exports.output = async ({message, args}) => {
 
     ef.models.send({
         object: message,
-        message: `**You have drawn option ${id + 1}:** \`${args[id]}\``
+        message: `**You have drawn option ${id + 1}:** \`${args[id].trim()}\``
     })
   }
   
