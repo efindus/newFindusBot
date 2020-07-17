@@ -1,4 +1,4 @@
-const { createHash } = require("crypto");
+const { randomBytes } = require("crypto");
 
 exports.random = async (Min, Max) =>
 {
