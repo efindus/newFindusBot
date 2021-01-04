@@ -17,10 +17,11 @@ module.exports = async (data) => {
 			if (data.type == 'text') {
 				let text = response.body[data.output]
 					text = `\`` + text + `\``
+				let author = response.body.author;
 				ef.models.send({
 					object: data.object,
 					message: `${text}`,
-					footer: `powered by api.alt-f4-team.xyz • Invoked by ${data.object.author.username}`
+					footer: `powered by api.alt-f4-team.xyz • Invoked by ${data.object.author.username}${author ? ` • Author: ${author}` : null}`
 				})
 			} else if (data.type == "image") {
 				const type = imageType(response.body)
