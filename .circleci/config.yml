@@ -3,7 +3,7 @@ orbs:
   node: circleci/node@4.1.0
 
 jobs:
-  instal-node:
+  install-node:
     docker:
       - image: cimg/base:stable
     steps:
@@ -14,5 +14,5 @@ jobs:
 workflows:
   build-and-test:
     jobs:
-      - instal-node
+      - install-node
       - node/test
