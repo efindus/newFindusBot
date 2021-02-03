@@ -13,7 +13,7 @@ exports.output = async ({message, guild, args}) => {
         translations.pl[0] = `${ef.emotes.markNo}Podaj poprawną nazwę użytkownika!`
         translations.en[0] = `${ef.emotes.markNo}Please enter a valid username!`
         translations.ru[0] = `${ef.emotes.markNo}Пожалуйста введите действительное имя пользователя!`
-        if(/[^a-z0-9_]/i.test(user)) return ef.models.send({object: message, message: `${translations[guild.settings.language][0]}`, color: ef.colors.red})
+        if(/[^a-z0-9_]/i.test(user) && user.length <= 16 && user.length >= 3) return ef.models.send({object: message, message: `${translations[guild.settings.language][0]}`, color: ef.colors.red})
 
         let desiredEndpoint = ''
 
