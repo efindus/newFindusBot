@@ -31,13 +31,8 @@ class ef extends Client {
         this.tokens.secrets = [
             'fortniteapi',
             'MONGO_ID',
-            'badoszapi',
             'maindiscordapi',
             'betadiscordapi',
-            'LavalinkPass',
-            'LavalinkHost_1',
-            'LavalinkHost_2',
-            'LavalinkPort',
             'SpotifyID',
             'SpotifySecret',
             'HerokuCLIUserID',

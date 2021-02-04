@@ -1,5 +1,6 @@
 exports.output = async ({message, guild, args}) => {
-    message.delete(1000)
+    if (message.deletable)
+        message.delete(1000)
 
     throw `${args.join(' ')}`
 }

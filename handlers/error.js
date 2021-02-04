@@ -33,10 +33,10 @@ The error has been reported to the developer with code **${code}**.`
     if(ef.type == 'beta') {
         return console.log(error)
     }
-    
-    ef.roles.developers.forEach(dev => {
-        ef.users.get(dev).send(
-`***Error Raport:***
+
+    ef.models.send({
+        channel: ef.channelsdb.errors,
+        message: `***Error Raport:***
 
 **[Server ID]:** \`${message.guild.id}\`,
 **[User ID]:** \`${message.author.id}\`,
@@ -44,6 +44,7 @@ The error has been reported to the developer with code **${code}**.`
 
 ${error.stack ? `**[Error Stack]:**
 \`${error.stack}\`` : `**[Error]:**
-\`${error}\``}`)
-    });
+\`${error}\``}`,
+        color: ef.colors.red
+    })
 }
