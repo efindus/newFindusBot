@@ -14,11 +14,12 @@ module.exports = async (data) => {
 
 	ef.http.get(`http://api.alt-f4-team.xyz/${data.endpoint}`)
 		.then(async response => {
-			if (response.body?.apiStatus === 'Currently unavailable') {
+			if (response.body === undefined || response.body !== undefined && response.body.apiStatus === 'Currently unavailable') {
 				ef.models.send({
 					object: data.object,
 					message: `${ef.emotes.markNo}API is currently unavailable.`,
-					footer: `powered by api.alt-f4-team.xyz • Invoked by ${data.object.author.username}`
+					footer: `powered by api.alt-f4-team.xyz • Invoked by ${data.object.author.username}`,
+					color: ef.colors.red
 				})
 			} else {
 				if (data.type == 'text') {
