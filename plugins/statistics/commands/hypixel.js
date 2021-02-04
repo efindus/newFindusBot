@@ -36,6 +36,9 @@ exports.output = async ({message, guild, args}) => {
             case 'guild':
                 desiredEndpoint = 'guild/general'
                 break;
+            case 'plancke-xp':
+                desiredEndpoint = 'plancke-xp'
+                break;
             default:
                 return ef.models.send({
                     object: message,
@@ -44,9 +47,9 @@ exports.output = async ({message, guild, args}) => {
                 })
         }
 
-        const response = await ef.http.get(`${planckeBaseURL}${user}.png`);
-
-        if(Buffer.from(response.body).toString('utf8') == "ensure==BadPlayerException"){
+        const mojangAPIResponse = await ef.http.get(`${mojangAPI}${user}`)
+        
+        if (Buffer.isBuffer(mojangAPIResponse.body)) {
             translations.pl[0] = `${ef.emotes.markNo}Użytkownik nie istnieje!`
             translations.en[0] = `${ef.emotes.markNo}User does not exist!`
             translations.ru[0] = `${ef.emotes.markNo}Пользователь не существует!`
@@ -56,35 +59,70 @@ exports.output = async ({message, guild, args}) => {
                 color: ef.colors.red
             })
         } else {
-            const mojangAPIResponse = await ef.http.get(`${mojangAPI}${user}`)
-
             const UUID = mojangAPIResponse.body.id
 
-            const paniekAPIResponse = await ef.http.get(`${paniekBaseURL}${UUID}/${desiredEndpoint}`)
+            if (desiredEndpoint === 'plancke-xp') {
+                const planckeResponse = await ef.http.get(`${planckeBaseURL}${user}.png`)
 
-            let img = new canvas.Image()
-            img.src = paniekAPIResponse.body
+                if(Buffer.from(planckeResponse.body).toString('utf8') !== "ensure==BadPlayerException"){
+                    const file = new Attachment(planckeResponse.body, `${user}.png`)
+                
+                    translations.pl[0] = `Statystyki dla ${user}`
+                    translations.en[0] = `Stats for ${user}`
+                    translations.ru[0] = `Статистика для ${user}`
+                    
+                    return await ef.models.send({
+                        object: message,
+                        message: ``,
+                        file: file,
+                        image: `attachment://${user}.png`,
+                        footer: `${translations[guild.settings.language][0]}`
+                    })
+                } else {
+                    translations.pl[0] = `${ef.emotes.markNo}Użytkownik nie istnieje!`
+                    translations.en[0] = `${ef.emotes.markNo}User does not exist!`
+                    translations.ru[0] = `${ef.emotes.markNo}Пользователь не существует!`
+                    return await ef.models.send({
+                        object: message,
+                        message: `${translations[guild.settings.language][0]}`,
+                        color: ef.colors.red
+                    })
+                }
+            }
 
-            let can = canvas.createCanvas(img.width, img.height)
-            let ctx = can.getContext('2d')
-            ctx.fillStyle = '#ffffff'
-            ctx.fillRect(0, 0, img.width, img.height)
-            ctx.drawImage(img, 0, 0, img.width, img.height)
-            can.createPNGStream()
+            try {
+                const paniekAPIResponse = await ef.http.get(`${paniekBaseURL}${UUID}/${desiredEndpoint}`)
 
-            const file = new Attachment(can.createPNGStream(), `${user}.png`)
-            
-            translations.pl[0] = `Statystyki dla ${user}`
-            translations.en[0] = `Stats for ${user}`
-            translations.ru[0] = `Статистика для ${user}`
-            
-            ef.models.send({
-                object: message,
-                message: ``,
-                file: file,
-                image: `attachment://${user}.png`,
-                footer: `${translations[guild.settings.language][0]}`
-            })
+                let img = new canvas.Image()
+                img.src = paniekAPIResponse.body
+
+                let can = canvas.createCanvas(img.width, img.height)
+                let ctx = can.getContext('2d')
+                ctx.fillStyle = '#ffffff'
+                ctx.fillRect(0, 0, img.width, img.height)
+                ctx.drawImage(img, 0, 0, img.width, img.height)
+                can.createPNGStream()
+
+                const file = new Attachment(can.createPNGStream(), `${user}.png`)
+                
+                translations.pl[0] = `Statystyki dla ${user}`
+                translations.en[0] = `Stats for ${user}`
+                translations.ru[0] = `Статистика для ${user}`
+                
+                ef.models.send({
+                    object: message,
+                    message: ``,
+                    file: file,
+                    image: `attachment://${user}.png`,
+                    footer: `${translations[guild.settings.language][0]}`
+                })
+            } catch (e) {
+                ef.models.send({
+                    object: message,
+                    message: `${ef.emotes.markNo}This user either haven't played on Hypixel, or I can't get this statistic for him.`,
+                    color: ef.colors.red
+                })
+            }
         }
     } catch (e) {
         ef.models.send({
@@ -104,13 +142,13 @@ exports.data = {
     },
     usage: {
         pl: [
-            '{prefix}{command} <nazwa użytkownika w Minecraft> <general/general-info/bedwars/duels/skywars/guild>'
+            '{prefix}{command} <nazwa użytkownika w Minecraft> <general/general-info/bedwars/duels/skywars/guild/plancke-xp>'
         ],
         en: [
-            '{prefix}{command} <Minecraft username> <general/general-info/bedwars/duels/skywars/guild>'
+            '{prefix}{command} <Minecraft username> <general/general-info/bedwars/duels/skywars/guild/plancke-xp>'
         ],
         ru: [
-            '{prefix}{command} <Имя пользователя Minecraft> <general/general-info/bedwars/duels/skywars/guild>'
+            '{prefix}{command} <Имя пользователя Minecraft> <general/general-info/bedwars/duels/skywars/guild/plancke-xp>'
         ]
     },
     args: {
